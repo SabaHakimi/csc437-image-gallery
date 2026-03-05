@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { MainLayout } from "../MainLayout.jsx";
+import { useParams } from "react-router";
 import { fetchById } from "./ImageFetcher.js";
 
-export function ImageDetails({ imageId }) {
-    const [image, _setImage] = useState(fetchById(imageId));
+export function ImageDetails() {
+    const { id } = useParams();
+    const [image, _setImage] = useState(() => fetchById(id));
     if (!image) {
-        return <MainLayout><h2>Image not found</h2></MainLayout>;
+        return <h2>Image not found</h2>;
     }
 
     return (
-        <MainLayout>
+        <>
             <h2>{image.name}</h2>
             <p>By {image.author.username}</p>
             <img className="ImageDetails-img" src={image.src} alt={image.name} />
-        </MainLayout>
+        </>
     )
 }

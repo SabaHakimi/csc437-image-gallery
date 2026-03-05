@@ -1,17 +1,22 @@
+import { Routes, Route } from "react-router";
 import { AllImages } from "./images/AllImages.jsx";
 import { ImageDetails } from "./images/ImageDetails.jsx";
 import { UploadPage } from "./UploadPage.jsx";
 import { LoginPage } from "./LoginPage.jsx";
+import { MainLayout } from "./MainLayout.jsx";
+import { VALID_ROUTES } from "../../shared/ValidRoutes.js";
 
 function App() {
-    const POSSIBLE_PAGES = [
-        <AllImages />,
-        <ImageDetails imageId={"0"} />,
-        <UploadPage />,
-        <LoginPage />
-    ];
-
-    return POSSIBLE_PAGES[0];
+    return (
+        <Routes>
+            <Route element={<MainLayout />}>
+                <Route path={VALID_ROUTES.HOME} element={<AllImages />} />
+                <Route path={VALID_ROUTES.UPLOAD} element={<UploadPage />} />
+                <Route path={VALID_ROUTES.LOGIN} element={<LoginPage />} />
+                <Route path={VALID_ROUTES.IMAGE_DETAILS} element={<ImageDetails />} />
+            </Route>
+        </Routes>
+    );
 }
 
 export default App;

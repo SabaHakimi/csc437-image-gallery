@@ -1,0 +1,36 @@
+### Get all images.  Each request **MUST** be delimited by a triple hash
+# This is a comment
+GET http://localhost:3000/api/images
+
+### Get one image by ID (valid ID)
+GET http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
+
+### Get one image by ID (non-existent)
+GET http://localhost:3000/api/images/69ac9b8777681b3a5519aa00
+
+### Get one image by ID (invalid ObjectId)
+GET http://localhost:3000/api/images/not-a-valid-id
+
+### Rename image (success — 204)
+PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
+Content-Type: application/json
+
+{ "name": "Blue merle herding sheep" }
+
+### Rename image (bad request — missing name field)
+PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
+Content-Type: application/json
+
+{ "title": "oops wrong field" }
+
+### Rename image (not found — non-existent ID)
+PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa00
+Content-Type: application/json
+
+{ "name": "Some name" }
+
+### Rename image (content too large — name over 100 chars)
+PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
+Content-Type: application/json
+
+{ "name": "This name is deliberately made to be excessively long so that it exceeds the one hundred character limit that we set" }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
+import { ImageNameEditor } from "./ImageNameEditor.tsx";
 
 export function ImageDetails() {
     const { id } = useParams();
@@ -10,13 +11,12 @@ export function ImageDetails() {
     useEffect(() => {
         async function fetchImage() {
             try {
-                const response = await fetch("/api/images");
+                const response = await fetch(`/api/images/${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json();
-                const found = data.find(img => img.id === id);
-                setImage(found || null);
+                setImage(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -38,10 +38,19 @@ export function ImageDetails() {
         return <h2>Image not found</h2>;
     }
 
+    function handleNameChanged(newName) {
+        setImage({ ...image, name: newName });
+    }
+
     return (
         <>
             <h2>{image.name}</h2>
             <p>By {image.author.username}</p>
+            <ImageNameEditor
+                imageId={image._id}
+                initialValue={image.name}
+                onNameChanged={handleNameChanged}
+            />
             <img className="ImageDetails-img" src={image.src} alt={image.name} />
         </>
     )

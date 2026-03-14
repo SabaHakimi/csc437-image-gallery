@@ -21,8 +21,6 @@ const credentialsProvider = new CredentialsProvider(mongoClient);
 const app = express();
 
 app.use(express.json());
-app.use(express.static(STATIC_DIR));
-app.use("/uploads", express.static(IMAGE_UPLOAD_DIR));
 
 app.get("/api/hello", (req, res) => {
     res.send("Hello, World " + SHARED_TEST);
@@ -32,6 +30,9 @@ app.use(["/api/images", "/api/images/:id"], verifyAuthToken);
 
 registerImageRoutes(app, imageProvider);
 registerAuthRoutes(app, credentialsProvider);
+
+app.use(express.static(STATIC_DIR));
+app.use("/uploads", express.static(IMAGE_UPLOAD_DIR));
 
 app.get(Object.values(VALID_ROUTES), (req, res) => {
     res.sendFile("index.html", { root: STATIC_DIR });

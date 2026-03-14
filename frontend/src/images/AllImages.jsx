@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ImageGrid } from "./ImageGrid.jsx";
 
-export function AllImages() {
+export function AllImages({ authToken }) {
     const [imageData, setImageData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -9,7 +9,11 @@ export function AllImages() {
     useEffect(() => {
         async function fetchImages() {
             try {
-                const response = await fetch("/api/images");
+                const response = await fetch("/api/images", {
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status} ${response.statusText}`);
                 }

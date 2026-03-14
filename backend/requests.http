@@ -2,6 +2,10 @@
 # This is a comment
 GET http://localhost:3000/api/images
 
+### Get all images (with valid token - replace with a real token from login)
+GET http://localhost:3000/api/images
+Authorization: Bearer <replace_with_token_from_login>
+
 ### Get one image by ID (valid ID)
 GET http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
 
@@ -34,3 +38,75 @@ PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
 Content-Type: application/json
 
 { "name": "This name is deliberately made to be excessively long so that it exceeds the one hundred character limit that we set" }
+
+### Rename image (Forbidden - Not the owner)
+# Replace with a token for a user that is NOT the owner of image 69ac9b8777681b3a5519aa0b
+PATCH http://localhost:3000/api/images/69ac9b8777681b3a5519aa0b
+Content-Type: application/json
+Authorization: Bearer <replace_with_token_for_non_owner>
+
+{ "name": "Trying to steal ownership" }
+
+### Register a new user (Happy Path)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "password456"
+}
+
+### Register a user (Conflict - Username already exists)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "email": "another@example.com",
+    "password": "password123"
+}
+
+### Register a user (Bad Request - Missing field)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "newuser",
+    "email": "new@example.com"
+}
+
+### Login (Happy Path)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "password456"
+}
+
+### Login (Unauthorized - Wrong Password)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "wrongpassword"
+}
+
+### Login (Unauthorized - Non-existent User)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+    "username": "nonexistent",
+    "password": "password123"
+}
+
+### Login (Bad Request - Missing field)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{
+    "username": "testuser"
+}

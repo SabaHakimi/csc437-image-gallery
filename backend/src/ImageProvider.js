@@ -60,11 +60,20 @@ export class ImageProvider {
         return results.length > 0 ? results[0] : null;
     }
 
-    async updateImageName(imageId, newName) {
+    async updateImageName(imageId, newName, username) {
         const result = await this.collection.updateOne(
-            { _id: new ObjectId(imageId) },
+            { _id: new ObjectId(imageId), authorId: username },
             { $set: { name: newName } }
         );
         return result.matchedCount;
+    }
+
+    async createImage(src, name, authorId) {
+        const result = await this.collection.insertOne({
+            src,
+            name,
+            authorId
+        });
+        return result.insertedId;
     }
 }

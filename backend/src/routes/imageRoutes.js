@@ -1,6 +1,7 @@
 import express from "express";
 import { ObjectId } from "mongodb";
 import { ImageProvider } from "../ImageProvider.js";
+import { imageMiddlewareFactory, handleImageFileErrors } from "../imageUploadMiddleware.js";
 
 const MAX_NAME_LENGTH = 100;
 
@@ -9,6 +10,38 @@ function waitDuration(numMs) {
 }
 
 export function registerImageRoutes(app, imageProvider) {
+    app.post(
+        "/api/images",
+        imageMiddlewareFactory.single("image"),
+        handleImageFileErrors,
+        async (req, res) => {
+            const { name } = req.body || {};
+            const file = req.file;
+
+            if (!name || !file) {
+                res.status(400).send({
+                    error: "Bad Request",
+                    message: "Missing 'name' or 'image' file"
+                });
+                return;
+            }
+
+            const authorId = req.userInfo?.username;
+            if (!authorId) {
+                res.status(401).send({
+                    error: "Unauthorized",
+                    message: "User not authenticated"
+                });
+                return;
+            }
+
+            const src = `/uploads/${file.filename}`;
+            const imageId = await imageProvider.createImage(src, name, authorId);
+
+            res.status(201).json({ id: imageId });
+        }
+    );
+
     app.get("/api/images", async (req, res) => {
         await waitDuration(1000);
         const images = await imageProvider.getAllImages();
@@ -55,12 +88,21 @@ export function registerImageRoutes(app, imageProvider) {
             return;
         }
 
-        const matchedCount = await imageProvider.updateImageName(id, name);
+        const username = req.userInfo?.username;
+        const matchedCount = await imageProvider.updateImageName(id, name, username);
         if (matchedCount === 0) {
-            res.status(404).send({
-                error: "Not Found",
-                message: "Image does not exist"
-            });
+            const image = await imageProvider.getOneImage(id);
+            if (!image) {
+                res.status(404).send({
+                    error: "Not Found",
+                    message: "Image does not exist"
+                });
+            } else {
+                res.status(403).send({
+                    error: "Forbidden",
+                    message: "This user does not own this image"
+                });
+            }
             return;
         }
 
